@@ -1,0 +1,11 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.idea/
+.vscode/
+
+# Project Specific
+logs/
+models/
+data/

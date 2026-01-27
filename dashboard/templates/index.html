@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AIOps Monitor v2.1</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        background: ({ opacityValue }) => `rgba(var(--color-background), ${opacityValue || 1})`,
+                        surface: ({ opacityValue }) => `rgba(var(--color-surface), ${opacityValue || 1})`,
+                        surfaceHeader: ({ opacityValue }) => `rgba(var(--color-surface-header), ${opacityValue || 1})`,
+                        primary: '#3B82F6',
+                        secondary: '#6366F1',
+                        accent: '#06B6D4',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        textMain: ({ opacityValue }) => `rgba(var(--color-text-main), ${opacityValue || 1})`,
+                        textMuted: ({ opacityValue }) => `rgba(var(--color-text-muted), ${opacityValue || 1})`
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="bg-background text-textMain antialiased overflow-hidden h-screen flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-surface border-r border-white/5 flex flex-col z-20">
+        <div class="h-16 flex items-center px-6 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/20">
+                    <i class="fa-solid fa-chart-line text-textMain text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight text-textMain leading-tight">AIOps</h1>
+                    <p class="text-[10px] text-textMuted uppercase tracking-wider font-semibold">Monitor v2.1</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <a href="#" class="nav-item active">
+                <i class="fa-solid fa-table-columns w-5 text-center"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fa-solid fa-bell w-5 text-center"></i>
+                <span>Alerts</span>
+                <span id="nav-incident-count"
+                    class="ml-auto bg-danger/20 text-danger text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fa-solid fa-list-ul w-5 text-center"></i>
+                <span>Logs</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fa-solid fa-robot w-5 text-center"></i>
+                <span>Predictions</span>
+            </a>
+            <div class="pt-6 pb-2">
+                <p class="px-3 text-xs font-semibold text-textMuted/50 uppercase tracking-wider">Settings</p>
+            </div>
+            <a href="#" class="nav-item">
+                <i class="fa-solid fa-server w-5 text-center"></i>
+                <span>Infrastructure</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fa-solid fa-gear w-5 text-center"></i>
+                <span>Configuration</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-white/5">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-full bg-surfaceHeader border border-white/10 flex items-center justify-center text-warning">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=random"
+                        class="rounded-full opacity-80" alt="Admin">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-textMain truncate">Santhosh D</p>
+                    <p class="text-xs text-textMuted truncate">DevOps Lead</p>
+                </div>
+                <button class="text-textMuted hover:text-textMain transition"><i
+                        class="fa-solid fa-arrow-right-from-bracket"></i></button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-background">
+        <!-- Topbar -->
+        <header
+            class="h-16 flex items-center justify-between px-8 border-b border-white/5 bg-background/50 backdrop-blur-sm z-10">
+            <div class="flex-1 max-w-xl">
+                <div class="relative group">
+                    <i
+                        class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-textMuted group-hover:text-textMain transition"></i>
+                    <input type="text" placeholder="Search metrics, logs, or services..."
+                        class="w-full bg-surfaceHeader border border-white/5 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition text-textMain placeholder-textMuted/70">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <div id="connection-status"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20 text-success text-xs font-medium">
+                    <span class="relative flex h-2 w-2">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                    </span>
+                    System Stable
+                </div>
+
+                <div class="h-4 w-px bg-white/10"></div>
+
+                <button
+                    class="bg-surfaceHeader hover:bg-surface border border-white/5 text-xs font-medium px-3 py-1.5 rounded-md text-textMuted transition flex items-center gap-2">
+                    <i class="fa-solid fa-server"></i> US-East-1
+                </button>
+
+                <div class="flex items-center gap-4 text-textMuted">
+                    <button id="theme-toggle" class="hover:text-textMain transition"><i
+                            class="fa-solid fa-moon"></i></button>
+                    <button class="hover:text-textMain transition relative">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-danger rounded-full"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-8 scrollbar-hide">
+
+            <div class="grid grid-cols-12 gap-6 h-full">
+
+                <!-- Left Column (Stats) -->
+                <div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
+                    <!-- CPU Card -->
+                    <div class="stat-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xs font-medium text-textMuted uppercase tracking-wider mb-1"><i
+                                        class="fa-solid fa-microchip mr-2"></i>CPU Usage</h3>
+                                <div class="text-3xl font-bold text-textMain flex items-end gap-2">
+                                    <span id="val-cpu">0%</span>
+                                    <span
+                                        class="text-xs font-normal text-success mb-1 bg-success/10 px-1.5 py-0.5 rounded">+2%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="h-24 w-full">
+                            <canvas id="miniCpuChart"></canvas>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-textMuted mt-2 px-1">
+                            <span>10:00 AM</span>
+                            <span>11:00 AM</span>
+                        </div>
+                    </div>
+
+                    <!-- Memory Card -->
+                    <div class="stat-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xs font-medium text-textMuted uppercase tracking-wider mb-1"><i
+                                        class="fa-solid fa-memory mr-2"></i>Memory</h3>
+                                <div class="text-3xl font-bold text-textMain flex items-end gap-2">
+                                    <span id="val-mem">0</span>
+                                    <span class="text-lg text-textMuted">/ 16GB</span>
+                                    <span
+                                        class="text-xs font-normal text-success mb-1 bg-success/10 px-1.5 py-0.5 rounded">+0.5%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="h-24 w-full">
+                            <canvas id="miniMemChart"></canvas>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-textMuted mt-2 px-1">
+                            <span>10:00 AM</span>
+                            <span>11:00 AM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Column (Hero/Confidence) -->
+                <div class="col-span-12 lg:col-span-6 flex flex-col gap-6">
+                    <!-- Hero Status -->
+                    <div
+                        class="hero-card relative overflow-hidden p-8 flex flex-col items-center justify-center text-center h-[380px]">
+                        <div
+                            class="absolute top-4 right-4 text-xs font-mono text-textMuted/50 border border-white/5 px-2 py-1 rounded bg-black/20">
+                            <i class="fa-regular fa-clock mr-1"></i> Updated: Just now
+                        </div>
+
+                        <h2 class="text-2xl font-semibold text-textMain mb-2">System Pulse</h2>
+                        <p class="text-textMuted text-sm mb-10">Real-time Anomaly Detection</p>
+
+                        <!-- Pulse Ring Animation -->
+                        <div class="relative">
+                            <div id="pulse-ring"
+                                class="pulse-ring-container w-64 h-64 rounded-full border border-white/5 flex items-center justify-center relative z-10 backdrop-blur-sm bg-surface/30">
+                                <div class="absolute inset-0 rounded-full border border-primary/20 animate-spin-slow">
+                                </div>
+                                <div
+                                    class="absolute inset-4 rounded-full border border-secondary/20 animate-reverse-spin">
+                                </div>
+
+                                <div class="flex flex-col items-center">
+                                    <div id="pulse-icon"
+                                        class="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center text-success text-3xl mb-3 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                    <h3 id="pulse-status-text" class="text-xl font-bold text-textMain tracking-wide">
+                                        Normal
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <!-- Background Glow -->
+                            <div
+                                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Predictions Stats Row -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="stat-card flex flex-col items-center justify-center text-center py-6">
+                            <span class="text-xs text-textMuted uppercase tracking-wider mb-2">Confidence Score</span>
+                            <div class="text-4xl font-bold text-textMain mb-2" id="val-confidence">99.8%</div>
+                            <div class="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
+                                <div id="confidence-bar"
+                                    class="h-full bg-success w-full text-right transition-all duration-500"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card flex flex-col items-center justify-center text-center py-6">
+                            <span class="text-xs text-textMuted uppercase tracking-wider mb-2">Next Predicted
+                                Anomaly</span>
+                            <div class="text-lg font-bold text-textMain flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved text-success"></i>
+                                <span>None > 48hrs</span>
+                            </div>
+                            <span class="text-[10px] text-textMuted mt-1">Based on historical trends</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Latency/More Stats) -->
+                <div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
+                    <!-- Latency Card -->
+                    <div class="stat-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xs font-medium text-textMuted uppercase tracking-wider mb-1"><i
+                                        class="fa-solid fa-stopwatch mr-2"></i>Latency</h3>
+                                <div class="text-3xl font-bold text-textMain flex items-end gap-2">
+                                    <span id="val-lat">24ms</span>
+                                    <span
+                                        class="text-xs font-normal text-textMuted mb-1 bg-white/5 px-1.5 py-0.5 rounded">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="h-24 w-full">
+                            <canvas id="miniLatChart"></canvas>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-textMuted mt-2 px-1">
+                            <span>10:00 AM</span>
+                            <span>11:00 AM</span>
+                        </div>
+                    </div>
+
+                    <!-- Network/IO (Simulated for visuals as requested by image) -->
+                    <div class="stat-card bg-gradient-to-b from-surface to-[#0d1016]">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xs font-medium text-textMuted uppercase tracking-wider mb-1"><i
+                                        class="fa-solid fa-network-wired mr-2"></i>Network I/O</h3>
+                                <div class="text-3xl font-bold text-textMain flex items-end gap-2">
+                                    <span>1.2 GB/s</span>
+                                    <span
+                                        class="text-xs font-normal text-success mb-1 bg-success/10 px-1.5 py-0.5 rounded">+12%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="h-24 w-full relative">
+                            <!-- Decorative wave for visual filler -->
+                            <canvas id="networkChart"></canvas>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-textMuted mt-2 px-1">
+                            <span>10:00 AM</span>
+                            <span>11:00 AM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row (Logs) -->
+                <div class="col-span-12 mt-2">
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between mb-6 px-2">
+                            <h3 class="flex items-center gap-2 text-lg font-semibold text-textMain">
+                                <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+                                Live Prediction Log
+                            </h3>
+                            <a href="#"
+                                class="text-xs text-primary hover:text-textMain transition flex items-center gap-1">View
+                                Full History <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr
+                                        class="text-[10px] text-textMuted uppercase tracking-wider border-b border-white/5">
+                                        <th class="pb-3 pl-2 font-medium">Timestamp</th>
+                                        <th class="pb-3 font-medium">Service</th>
+                                        <th class="pb-3 font-medium">Prediction</th>
+                                        <th class="pb-3 font-medium">Severity</th>
+                                        <th class="pb-3 font-medium">Action Taken</th>
+                                        <th class="pb-3 pr-2 text-right font-medium">Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-table-body" class="divide-y divide-white/5">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+
+</html>

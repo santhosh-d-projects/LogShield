@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+    /* Light Mode Defaults */
+    --color-background: 248, 250, 252;
+    /* Slate 50 */
+    --color-surface: 255, 255, 255;
+    /* White */
+    --color-surface-header: 255, 255, 255;
+    --color-text-main: 15, 23, 42;
+    /* Slate 900 */
+    --color-text-muted: 100, 116, 139;
+    /* Slate 500 */
+
+    --card-bg: 255, 255, 255;
+    --card-border: 226, 232, 240;
+    /* Slate 200 */
+}
+
+:root.dark {
+    /* Dark Mode Overrides */
+    --color-background: 11, 14, 20;
+    /* #0B0E14 */
+    --color-surface: 21, 26, 35;
+    /* #151A23 */
+    --color-surface-header: 30, 35, 48;
+    /* #1E2330 */
+    --color-text-main: 226, 232, 240;
+    /* #E2E8F0 */
+    --color-text-muted: 148, 163, 184;
+    /* #94A3B8 */
+
+    --card-bg: 21, 26, 35;
+    --card-border: 255, 255, 255;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: rgba(var(--color-background));
+    color: rgba(var(--color-text-main));
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(var(--color-text-muted), 0.3);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--color-text-muted), 0.5);
+}
+
+/* Utility: Hide Scrollbar but keep functionality */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Navigation Items */
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    color: rgba(var(--color-text-muted));
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    margin-bottom: 2px;
+}
+
+.nav-item:hover {
+    background: rgba(var(--color-text-main), 0.05);
+    color: rgba(var(--color-text-main));
+}
+
+.nav-item.active {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), transparent);
+    color: #3B82F6;
+    border-left: 2px solid #3B82F6;
+}
+
+/* Glass/Stat Cards */
+.stat-card {
+    background: rgba(var(--card-bg), 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(var(--card-border), 0.08);
+    /* Low opacity border */
+    border-radius: 16px;
+    padding: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+:root.dark .stat-card {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card:hover {
+    border-color: rgba(var(--card-border), 0.2);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.hero-card {
+    background: radial-gradient(circle at top right, rgba(var(--card-border), 0.1), rgba(var(--color-background), 0.9));
+    border: 1px solid rgba(var(--card-border), 0.08);
+    border-radius: 20px;
+    position: relative;
+    box-shadow: 0 0 50px -12px rgba(0, 0, 0, 0.1);
+}
+
+:root.dark .hero-card {
+    background: radial-gradient(circle at top right, rgba(30, 41, 59, 0.5), rgba(11, 14, 20, 0.9));
+    box-shadow: 0 0 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Animations */
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes reverse-spin {
+    from {
+        transform: rotate(360deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+.animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+}
+
+.animate-reverse-spin {
+    animation: reverse-spin 12s linear infinite;
+}
+
+/* Chart Canvas Adjustments */
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Table Enhancements */
+td {
+    vertical-align: middle;
+}
